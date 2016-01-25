@@ -11,10 +11,10 @@ except ImportError:
 
 class LogstashFormatterBase(logging.Formatter):
 
-    def __init__(self, message_type='Logstash', tags=None, fqdn=False):
+    def __init__(self, message_type='Logstash', tags=None, fqdn=False, token=None):
         self.message_type = message_type
         self.tags = tags if tags is not None else []
-
+        self.token = token
         if fqdn:
             self.host = socket.getfqdn()
         else:
@@ -125,12 +125,12 @@ class LogstashFormatterVersion1(LogstashFormatterBase):
             'path': record.pathname,
             'tags': self.tags,
             'type': self.message_type,
-
             # Extra Fields
             'level': record.levelname,
             'logger_name': record.name,
         }
-
+        if self.token is not None:
+            message['token'] = self.token
         # Add extra fields
         message.update(self.get_extra_fields(record))
 
